@@ -1,0 +1,1297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Game-Based HCP Education — Making the Case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
+<script src="deck-stage.js"></script>
+<style>
+  :root {
+    /* Brand colors — RH 2025 */
+    --navy-1:   #081F2B;
+    --navy-2:   #002B49;
+    --navy-deep:#04141C;
+    --lime:     #CDDE00;
+    --olive:    #7C8034;
+    --burnt:    #BC4700;
+    --maroon:   #9F2241;
+    --ink:      #0A1620;
+    --paper:    #F4F2EC;
+    --paper-2:  #EAE7DE;
+    --rule:     rgba(8,31,43,0.16);
+    --rule-dk:  rgba(255,255,255,0.18);
+    --muted:    #515151;
+    --muted-dk: #B7C3CC;
+
+    /* Type scale @ 1920×1080 */
+    --type-display: 132px;
+    --type-hero:    96px;
+    --type-title:   72px;
+    --type-subtitle:44px;
+    --type-lede:    38px;
+    --type-body:    30px;
+    --type-small:   24px;
+    --type-mono:    24px;
+
+    /* Spacing */
+    --pad-x:        120px;
+    --pad-top:      110px;
+    --pad-bottom:   100px;
+    --gap-title:    52px;
+    --gap-item:     32px;
+  }
+
+  html, body { margin: 0; padding: 0; background: #000; }
+  body { font-family: 'Montserrat', sans-serif; font-weight: 300; color: var(--ink); letter-spacing: 0.005em; }
+
+  deck-stage section {
+    box-sizing: border-box;
+    background: var(--paper);
+    color: var(--ink);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ---------- variants ---------- */
+  .dark {
+    background:
+      radial-gradient(120% 80% at 100% 0%, #1B0A2E 0%, transparent 55%),
+      radial-gradient(120% 90% at 0% 100%, #0E5C5C 0%, transparent 50%),
+      linear-gradient(135deg, #0A2438 0%, #061320 55%, #050D14 100%);
+    color: #fff;
+  }
+  .dark.with-noise::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(60% 60% at 20% 30%, rgba(205,222,0,0.06) 0%, transparent 60%),
+      radial-gradient(70% 50% at 90% 90%, rgba(205,222,0,0.05) 0%, transparent 70%);
+  }
+  .paper {
+    background: var(--paper);
+  }
+
+  /* ---------- shared chrome ---------- */
+  .frame {
+    position: absolute; inset: 0;
+    padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+    display: flex; flex-direction: column;
+  }
+
+  .topbar {
+    position: absolute; top: 56px; left: var(--pad-x); right: var(--pad-x);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: var(--type-small); letter-spacing: 0.22em; text-transform: uppercase;
+    font-weight: 500;
+  }
+  .topbar .crumb { color: var(--lime); }
+  .topbar .crumb-paper { color: var(--burnt); }
+  .topbar .doc { opacity: 0.7; letter-spacing: 0.22em; font-weight: 400; }
+  .dark .topbar .doc { color: var(--muted-dk); }
+  .paper .topbar .doc { color: var(--muted); }
+
+  .footbar {
+    position: absolute; bottom: 48px; left: var(--pad-x); right: var(--pad-x);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 24px; letter-spacing: 0.2em; text-transform: uppercase;
+    font-weight: 400;
+  }
+  .dark .footbar { color: rgba(255,255,255,0.55); }
+  .paper .footbar { color: rgba(8,31,43,0.55); }
+
+  .wordmark { height: 26px; opacity: 0.85; }
+  .dark .wordmark { filter: none; }
+  .paper .wordmark { filter: brightness(0) saturate(100%) invert(10%) sepia(13%) saturate(2400%) hue-rotate(167deg) brightness(95%) contrast(98%); }
+
+  /* ---------- type primitives ---------- */
+  .eyebrow {
+    font-size: var(--type-small); letter-spacing: 0.32em; text-transform: uppercase;
+    font-weight: 500; color: var(--lime);
+  }
+  .paper .eyebrow { color: var(--burnt); }
+
+  .title-xl {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 200;
+    font-size: var(--type-hero);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    margin: 0;
+  }
+  .title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 200;
+    font-size: var(--type-title);
+    line-height: 1.06;
+    letter-spacing: -0.012em;
+    margin: 0;
+  }
+  .subtitle {
+    font-size: var(--type-subtitle); line-height: 1.22; font-weight: 300; margin: 0;
+    letter-spacing: -0.005em;
+  }
+  .lede { font-size: var(--type-lede); line-height: 1.32; font-weight: 300; margin: 0; }
+  .body { font-size: var(--type-body); line-height: 1.4; font-weight: 300; margin: 0; }
+  .small { font-size: var(--type-small); line-height: 1.4; font-weight: 400; margin: 0; }
+  .mono {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: var(--type-small); letter-spacing: 0.08em; text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .display-num {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 200;
+    font-size: var(--type-display);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    color: var(--lime);
+  }
+  .paper .display-num { color: var(--navy-1); }
+
+  .lime { color: var(--lime); }
+  .burnt { color: var(--burnt); }
+  .maroon { color: var(--maroon); }
+  .navy { color: var(--navy-1); }
+
+  .rule { height: 1px; background: var(--rule); border: 0; margin: 0; }
+  .dark .rule { background: var(--rule-dk); }
+  .rule-lime { height: 4px; background: var(--lime); border: 0; width: 80px; margin: 0; }
+
+  /* ---------- cover ---------- */
+  .cover {
+    background:
+      linear-gradient(100deg, rgba(6,16,28,0.92) 0%, rgba(6,16,28,0.78) 38%, rgba(8,31,43,0.55) 62%, rgba(8,31,43,0.28) 100%),
+      url("assets/cover-glasses.jpg") center/cover no-repeat,
+      #000;
+    color: #fff;
+  }
+  .cover .frame { justify-content: space-between; }
+  .cover .meta-row { display: flex; gap: 80px; align-items: flex-start; }
+  .cover .meta-row .meta { font-size: 24px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 400; color: rgba(255,255,255,0.7); }
+  .cover .meta-row .meta strong { display: block; font-weight: 600; color: #fff; margin-top: 8px; letter-spacing: 0.12em; }
+  .cover .lockup { display: flex; align-items: center; gap: 28px; }
+  .cover .lockup img.sphere { width: 84px; height: auto; }
+
+  /* ---------- section divider ---------- */
+  .section-div {
+    background:
+      linear-gradient(120deg, #061824 0%, #04101A 65%, #03090F 100%);
+    color: #fff;
+  }
+  .section-div .frame { justify-content: center; align-items: flex-start; padding-left: 200px; }
+  .section-div .roman {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 200; font-size: 240px; line-height: 0.85;
+    color: var(--lime);
+    letter-spacing: -0.04em;
+  }
+  .section-div .section-kicker {
+    font-size: var(--type-small); letter-spacing: 0.4em; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); font-weight: 500; margin-bottom: 56px;
+  }
+  .section-div .section-title {
+    font-size: 104px; font-weight: 200; line-height: 1.05;
+    letter-spacing: -0.02em; margin-top: 36px; max-width: 1400px;
+  }
+  .section-div .section-rule {
+    width: 160px; height: 4px; background: var(--lime); margin: 56px 0 0;
+  }
+
+  /* ---------- metric slide ---------- */
+  .metric .frame { justify-content: center; }
+  .metric-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 100px; align-items: center;
+  }
+  .metric .display-num-stack { display: flex; align-items: baseline; gap: 18px; }
+  .metric .unit { font-size: 56px; font-weight: 300; color: var(--lime); letter-spacing: -0.01em; }
+  .paper .metric .unit { color: var(--navy-1); }
+  .metric .metric-label {
+    font-size: var(--type-small); letter-spacing: 0.32em; text-transform: uppercase;
+    font-weight: 500; color: var(--burnt); margin-bottom: 24px;
+  }
+  .dark .metric-label { color: var(--lime); }
+  .metric .metric-headline {
+    font-size: var(--type-subtitle); line-height: 1.18; font-weight: 300;
+    letter-spacing: -0.005em; margin-top: 40px; max-width: 720px;
+  }
+  .metric .metric-body { font-size: var(--type-body); line-height: 1.45; font-weight: 300; margin-top: 32px; max-width: 720px; }
+
+  /* ---------- quote ---------- */
+  .quote-mark {
+    font-family: 'Montserrat', sans-serif; font-weight: 200;
+    font-size: 240px; line-height: 0.6; color: var(--lime);
+  }
+  .paper .quote-mark { color: var(--burnt); }
+
+  /* ---------- ui bits ---------- */
+  .pill {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 14px 22px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500;
+  }
+  .paper .pill { border-color: rgba(8,31,43,0.18); color: var(--navy-1); }
+  .pill .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--lime); }
+
+  /* prevent default p / h margins */
+  h1, h2, h3, h4, p { margin: 0; }
+
+  /* responsive helpers */
+  .stack-12 > * + * { margin-top: 12px; }
+  .stack-24 > * + * { margin-top: 24px; }
+  .stack-32 > * + * { margin-top: 32px; }
+  .stack-48 > * + * { margin-top: 48px; }
+
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 60px; }
+  .two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+  .four-col  { display: grid; grid-template-columns: repeat(4, 1fr); gap: 48px; }
+
+  /* number block (exec summary) */
+  .num-block .n {
+    font-size: 96px; font-weight: 200; color: var(--lime); line-height: 0.95; letter-spacing: -0.03em;
+  }
+  .num-block .lbl { margin-top: 18px; font-size: 24px; line-height: 1.35; color: rgba(255,255,255,0.78); font-weight: 400; max-width: 320px; }
+
+  /* bar */
+  .bar-row { display: grid; grid-template-columns: 240px 1fr 120px; align-items: center; gap: 32px; padding: 24px 0; border-top: 1px solid rgba(8,31,43,0.14); }
+  .bar-row:last-child { border-bottom: 1px solid rgba(8,31,43,0.14); }
+  .bar-row .lbl { font-size: 30px; font-weight: 400; }
+  .bar-row .val { font-size: 30px; font-weight: 500; text-align: right; color: var(--navy-1); }
+  .bar-row .track { height: 18px; background: rgba(8,31,43,0.08); position: relative; }
+  .bar-row .fill { position: absolute; top: 0; left: 0; bottom: 0; background: var(--navy-1); }
+  .bar-row .fill.lime { background: var(--lime); }
+  .bar-row .fill.burnt { background: var(--burnt); }
+  .bar-row .fill.maroon { background: var(--maroon); }
+
+  /* finding card */
+  .finding-num {
+    font-size: 96px; font-weight: 200; color: var(--lime); letter-spacing: -0.02em; line-height: 0.95;
+  }
+  .paper .finding-num { color: var(--burnt); }
+
+  /* dot scale (1..7) */
+  .scale-dots { display: flex; gap: 14px; }
+  .scale-dots .d { width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.35); }
+  .scale-dots .d.on { background: var(--lime); border-color: var(--lime); }
+  .paper .scale-dots .d { border-color: rgba(8,31,43,0.25); }
+  .paper .scale-dots .d.on { background: var(--burnt); border-color: var(--burnt); }
+</style>
+
+<script type="application/json" id="speaker-notes">[]</script>
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- 01 COVER -->
+  <section class="cover" data-label="01 Cover">
+    <div class="frame">
+      <div class="meta-row" style="margin-top: 10px;">
+        <div class="lockup">
+          <img class="sphere" src="assets/sphere-mark.png" alt="" />
+          <img class="wordmark" src="assets/relevate-wordmark.svg" alt="Relevate Health" style="height: 32px; opacity: 1;" />
+        </div>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="color: var(--lime); margin-bottom: 36px;">Healthy Discussions · Making the Case</div>
+        <h1 class="title-xl" style="max-width: 1500px;">
+          Game-based<br />HCP education<br />
+          <span style="color: var(--lime); font-weight: 200;">earns its place</span> in the exam room.
+        </h1>
+        <hr class="rule-lime" style="margin-top: 56px;" />
+        <p class="lede" style="margin-top: 40px; max-width: 1200px; color: rgba(255,255,255,0.82); font-weight: 300;">
+          Independent research with 11 HCPs across family medicine, internal medicine, pediatrics, and urgent care.
+        </p>
+      </div>
+
+      <div class="meta-row">
+        <div class="meta">Prepared for<strong>Medical Affairs · Commercial · L&amp;D</strong></div>
+        <div class="meta">Basis<strong>Moderated HCP Research, 2025</strong></div>
+        <div class="meta">Status<strong>Confidential Discussion Draft</strong></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- 02 EXECUTIVE SUMMARY -->
+  <section class="dark with-noise" data-label="02 Executive Summary">
+    <div class="topbar">
+      <span class="crumb">Executive Summary</span>
+      <span class="doc">RH · Healthy Discussions</span>
+    </div>
+    <div class="frame">
+      <div style="margin-top: 30px; max-width: 1500px;">
+        <p class="eyebrow" style="margin-bottom: 36px;">The case in one page</p>
+        <h2 class="title" style="font-size: 78px;">
+          When game-based learning is built on real clinical data,
+          designed for HCPs, and deployed to the right audience —
+          <span class="lime">it produces outcomes traditional formats have not delivered.</span>
+        </h2>
+      </div>
+
+      <div class="four-col num-block" style="margin-top: auto; padding-top: 80px;">
+        <div>
+          <div class="n">+2<span style="font-size: 56px;">pts</span></div>
+          <div class="lbl">Confidence gain on a 7-point scale after a single gameplay session</div>
+        </div>
+        <div>
+          <div class="n">9<span style="font-size: 56px; color: rgba(255,255,255,0.5);">/11</span></div>
+          <div class="lbl">HCPs rate hesitation to engage with game-based learning at 3/7 or below</div>
+        </div>
+        <div>
+          <div class="n">9+<span style="font-size: 56px;">/10</span></div>
+          <div class="lbl">Likelihood to recommend among HCPs who found the game relevant</div>
+        </div>
+        <div>
+          <div class="n">10<span style="font-size: 56px; color: rgba(255,255,255,0.5);">/11</span></div>
+          <div class="lbl">Want game-based learning extended to additional treatments</div>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span>Healthy Discussions · Sales Narrative</span><span>02</span></div>
+  </section>
+
+
+  <!-- 03 SECTION DIVIDER — THE HCP CHALLENGE -->
+  <section class="section-div" data-label="03 Section / Challenge">
+    <div class="frame">
+      <div class="section-kicker">Section One</div>
+      <div class="roman">01</div>
+      <h2 class="section-title">The HCP challenge.</h2>
+      <div class="section-rule"></div>
+      <p class="lede" style="margin-top: 48px; max-width: 1100px; color: rgba(255,255,255,0.78);">
+        HCPs are not struggling for conviction. They are struggling because the conversations are complex, time-constrained, and emotionally loaded — and their tools have not kept pace.
+      </p>
+    </div>
+    <div class="footbar"><span>Relevate Health</span><span>03</span></div>
+  </section>
+
+
+  <!-- 04 DAILY REALITY -->
+  <section class="paper" data-label="04 Daily Reality">
+    <div class="topbar">
+      <span class="crumb-paper">The HCP Challenge</span>
+      <span class="doc">01 · 04</span>
+    </div>
+    <div class="frame">
+      <div style="margin-top: 30px;">
+        <p class="eyebrow">A daily reality, in three voices</p>
+        <h2 class="title" style="margin-top: 32px; max-width: 1500px; font-size: 84px;">
+          The conversations are already happening.<br />
+          <span style="color: var(--burnt);">The tools haven't caught up.</span>
+        </h2>
+      </div>
+
+      <div class="three-col" style="margin-top: auto; padding-top: 100px;">
+        <div class="stack-32">
+          <div class="finding-num" style="color: var(--burnt); font-size: 64px;">01</div>
+          <hr class="rule-lime" style="background: var(--burnt); width: 60px;" />
+          <h3 class="subtitle" style="font-size: 36px; font-weight: 500; max-width: 460px;">It comes up every day — repeatedly.</h3>
+          <p class="body" style="max-width: 480px; color: var(--muted);">
+            "Today, ten minutes ago." Most HCPs no longer raise the topic proactively because patients have already made up their minds.
+          </p>
+        </div>
+        <div class="stack-32">
+          <div class="finding-num" style="color: var(--burnt); font-size: 64px;">02</div>
+          <hr class="rule-lime" style="background: var(--burnt); width: 60px;" />
+          <h3 class="subtitle" style="font-size: 36px; font-weight: 500; max-width: 460px;">Resistance isn't monolithic — but training treats it that way.</h3>
+          <p class="body" style="max-width: 480px; color: var(--muted);">
+            Adverse-event fear, public-figure distrust, social media misinformation, government suspicion. One scripted response can't cover it.
+          </p>
+        </div>
+        <div class="stack-32">
+          <div class="finding-num" style="color: var(--burnt); font-size: 64px;">03</div>
+          <hr class="rule-lime" style="background: var(--burnt); width: 60px;" />
+          <h3 class="subtitle" style="font-size: 36px; font-weight: 500; max-width: 460px;">The available tools are falling short.</h3>
+          <p class="body" style="max-width: 480px; color: var(--muted);">
+            CDC sheets described as "boring and wordy." Journal articles useful for self-study but they don't translate into patient conversation.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>04</span></div>
+  </section>
+
+
+  <!-- 05 SECTION DIVIDER — BY THE NUMBERS -->
+  <section class="section-div" data-label="05 Section / By the Numbers">
+    <div class="frame">
+      <div class="section-kicker">Section Two</div>
+      <div class="roman">02</div>
+      <h2 class="section-title">By the numbers.</h2>
+      <div class="section-rule"></div>
+      <p class="lede" style="margin-top: 48px; max-width: 1100px; color: rgba(255,255,255,0.78);">
+        Independent moderated research with eleven Healthcare Professionals across family medicine, internal medicine, pediatrics, and urgent care.
+      </p>
+    </div>
+    <div class="footbar"><span>Relevate Health</span><span>05</span></div>
+  </section>
+
+
+  <!-- 06 METRIC — CONFIDENCE GAIN -->
+  <section class="dark with-noise metric" data-label="06 Confidence Gain">
+    <div class="topbar">
+      <span class="crumb">By the Numbers · 01 of 07</span>
+      <span class="doc">Confidence</span>
+    </div>
+    <div class="frame">
+      <div class="metric-grid">
+        <div class="stack-32">
+          <div class="metric-label" style="color: var(--lime);">Metric 01 · Confidence</div>
+          <div class="display-num-stack">
+            <span class="display-num">+2</span>
+            <span class="unit">points on a 7-point scale</span>
+          </div>
+          <hr class="rule-lime" />
+          <p class="metric-headline" style="color: rgba(255,255,255,0.92);">
+            HCPs with genuine room to develop reported gains of <span class="lime">+1 to +2 points</span> in conversational confidence after a single gameplay session.
+          </p>
+        </div>
+
+        <div class="stack-32" style="padding-left: 40px; border-left: 1px solid rgba(255,255,255,0.12);">
+          <p class="mono lime">Before · After</p>
+          <div style="display: flex; align-items: flex-end; gap: 80px;">
+            <div>
+              <div style="font-size: 110px; font-weight: 200; color: rgba(255,255,255,0.5); line-height: 1;">4</div>
+              <div class="scale-dots" style="margin-top: 28px;">
+                <span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d"></span><span class="d"></span><span class="d"></span>
+              </div>
+            </div>
+            <div style="font-size: 80px; color: var(--lime); font-weight: 200;">→</div>
+            <div>
+              <div style="font-size: 110px; font-weight: 300; color: #fff; line-height: 1;">6</div>
+              <div class="scale-dots" style="margin-top: 28px;">
+                <span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d"></span>
+              </div>
+            </div>
+          </div>
+          <p class="small" style="color: rgba(255,255,255,0.65); max-width: 620px;">
+            Largest reported gain. Both +2 movers attributed the shift directly to the game's hesitancy-identification framework and clinical data content.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span>Healthy Discussions · Sales Narrative</span><span>06</span></div>
+  </section>
+
+
+  <!-- 07 METRIC — RECEPTIVITY -->
+  <section class="paper metric" data-label="07 Receptivity">
+    <div class="topbar">
+      <span class="crumb-paper">By the Numbers · 02 of 07</span>
+      <span class="doc">Receptivity</span>
+    </div>
+    <div class="frame">
+      <div class="metric-grid">
+        <div class="stack-32">
+          <div class="metric-label">Metric 02 · Receptivity</div>
+          <div class="display-num-stack">
+            <span class="display-num">9</span>
+            <span class="unit" style="color: var(--muted);">of 11 HCPs</span>
+          </div>
+          <hr class="rule" style="background: var(--burnt); height: 4px; width: 80px;" />
+          <p class="metric-headline">
+            Rated their hesitation to engage with game-based medical learning at <strong style="font-weight: 500;">3 out of 7 or below.</strong>
+          </p>
+          <p class="metric-body" style="color: var(--muted);">
+            The dominant attitude in this group was openness, not resistance — format adoption is not a barrier, it is an opportunity waiting to be activated.
+          </p>
+        </div>
+
+        <div style="padding-left: 40px;">
+          <p class="mono burnt">Hesitation · 1 = none, 7 = total</p>
+          <div style="display: grid; grid-template-columns: repeat(11, 1fr); gap: 16px; margin-top: 36px; align-items: end; height: 380px;">
+            <!-- 11 HCP bars showing their hesitation rating (1-7) -->
+            <div style="background: var(--burnt); height: 14%;"></div>
+            <div style="background: var(--burnt); height: 14%;"></div>
+            <div style="background: var(--burnt); height: 28%;"></div>
+            <div style="background: var(--burnt); height: 28%;"></div>
+            <div style="background: var(--burnt); height: 28%;"></div>
+            <div style="background: var(--burnt); height: 28%;"></div>
+            <div style="background: var(--burnt); height: 42%;"></div>
+            <div style="background: var(--burnt); height: 42%;"></div>
+            <div style="background: var(--burnt); height: 42%;"></div>
+            <div style="background: rgba(8,31,43,0.35); height: 70%;"></div>
+            <div style="background: rgba(8,31,43,0.35); height: 84%;"></div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(11, 1fr); gap: 16px; margin-top: 14px;">
+            <div class="small" style="text-align: center; color: var(--muted);">1</div>
+            <div class="small" style="text-align: center; color: var(--muted);">1</div>
+            <div class="small" style="text-align: center; color: var(--muted);">2</div>
+            <div class="small" style="text-align: center; color: var(--muted);">2</div>
+            <div class="small" style="text-align: center; color: var(--muted);">2</div>
+            <div class="small" style="text-align: center; color: var(--muted);">2</div>
+            <div class="small" style="text-align: center; color: var(--muted);">3</div>
+            <div class="small" style="text-align: center; color: var(--muted);">3</div>
+            <div class="small" style="text-align: center; color: var(--muted);">3</div>
+            <div class="small" style="text-align: center; color: var(--muted);">5</div>
+            <div class="small" style="text-align: center; color: var(--muted);">6</div>
+          </div>
+          <p class="small" style="color: var(--muted); margin-top: 40px; max-width: 620px;">
+            Eleven HCPs, plotted by self-reported hesitation rating. The nine HCPs at or below 3/7 are shown in burnt orange.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>07</span></div>
+  </section>
+
+
+  <!-- 08 METRIC — DATA MODULE ENJOYMENT -->
+  <section class="dark with-noise metric" data-label="08 Data Enjoyment">
+    <div class="topbar">
+      <span class="crumb">By the Numbers · 03 of 07</span>
+      <span class="doc">Enjoyment</span>
+    </div>
+    <div class="frame">
+      <div class="metric-grid">
+        <div class="stack-32">
+          <div class="metric-label" style="color: var(--lime);">Metric 03 · Enjoyment of Data</div>
+          <div class="display-num-stack">
+            <span class="display-num">8&ndash;10</span>
+            <span class="unit">/10</span>
+          </div>
+          <hr class="rule-lime" />
+          <p class="metric-headline" style="color: rgba(255,255,255,0.92);">
+            Enjoyment scores across <span class="lime">every participant who completed</span> the clinical data module — COVID mortality, hospitalization, adverse event rates.
+          </p>
+          <p class="metric-body" style="color: rgba(255,255,255,0.7);">
+            High enjoyment of the data module is a signal of learning engagement, not entertainment. Participants cited the precision of the data and its immediate applicability in patient conversation.
+          </p>
+        </div>
+
+        <div style="padding-left: 40px; border-left: 1px solid rgba(255,255,255,0.12);">
+          <p class="mono lime">Why it scored high</p>
+          <div class="stack-24" style="margin-top: 32px;">
+            <div style="border-top: 1px solid rgba(255,255,255,0.14); padding-top: 24px;">
+              <p class="body" style="color: rgba(255,255,255,0.92); font-weight: 400;">Precision of the data</p>
+              <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 8px;">Specific numbers HCPs could cite — not general reassurance.</p>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.14); padding-top: 24px;">
+              <p class="body" style="color: rgba(255,255,255,0.92); font-weight: 400;">Immediate applicability</p>
+              <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 8px;">Talking points HCPs intended to use that week, in that practice.</p>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.14); padding-top: 24px;">
+              <p class="body" style="color: rgba(255,255,255,0.92); font-weight: 400;">Surprise at the numbers</p>
+              <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 8px;">Genuine new learning — adverse event rates were lower than assumed.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span>Healthy Discussions · Sales Narrative</span><span>08</span></div>
+  </section>
+
+
+  <!-- 09 METRIC — LEARNING EFFECTIVENESS -->
+  <section class="paper metric" data-label="09 Learning Effectiveness">
+    <div class="topbar">
+      <span class="crumb-paper">By the Numbers · 04 of 07</span>
+      <span class="doc">Effectiveness</span>
+    </div>
+    <div class="frame">
+      <div class="metric-grid">
+        <div class="stack-32">
+          <div class="metric-label">Metric 04 · Learning Effectiveness</div>
+          <div class="display-num-stack">
+            <span class="display-num">6&ndash;7</span>
+            <span class="unit" style="color: var(--muted);">/7</span>
+          </div>
+          <hr style="background: var(--burnt); height: 4px; width: 80px; border: 0;" />
+          <p class="metric-headline">
+            Self-rated learning effectiveness from HCPs who completed the game experience.
+          </p>
+          <p class="metric-body" style="color: var(--muted);">
+            Participants cited the combination of hesitancy-type identification training and data-driven talking points as the source of this effectiveness. Multiple described the experience as "not just fun — actually informative."
+          </p>
+        </div>
+
+        <div style="padding-left: 40px;">
+          <p class="mono burnt">Effectiveness Rating</p>
+          <div style="margin-top: 40px;">
+            <div class="scale-dots" style="gap: 22px;">
+              <span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d on" style="width: 52px; height: 52px;"></span><span class="d on" style="width: 52px; height: 52px;"></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 18px; max-width: 540px;">
+              <span class="small" style="color: var(--muted);">1 · Not effective</span>
+              <span class="small" style="color: var(--muted);">7 · Highly effective</span>
+            </div>
+          </div>
+          <blockquote style="margin: 64px 0 0; padding-left: 28px; border-left: 4px solid var(--burnt);">
+            <p style="font-size: 32px; line-height: 1.4; font-weight: 300; color: var(--ink); max-width: 620px;">
+              "Not just fun — <em style="font-style: normal; color: var(--burnt); font-weight: 500;">actually informative.</em>"
+            </p>
+            <p class="small" style="margin-top: 16px; color: var(--muted);">Internal medicine physician, recently in practice</p>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>09</span></div>
+  </section>
+
+
+  <!-- 10 METRIC — LIKELIHOOD TO RECOMMEND -->
+  <section class="dark with-noise metric" data-label="10 LTR">
+    <div class="topbar">
+      <span class="crumb">By the Numbers · 05 of 07</span>
+      <span class="doc">Recommend</span>
+    </div>
+    <div class="frame">
+      <div class="metric-grid">
+        <div class="stack-32">
+          <div class="metric-label" style="color: var(--lime);">Metric 05 · Likelihood to Recommend</div>
+          <div class="display-num-stack">
+            <span class="display-num">9+</span>
+            <span class="unit">/10 average</span>
+          </div>
+          <hr class="rule-lime" />
+          <p class="metric-headline" style="color: rgba(255,255,255,0.92);">
+            Among HCPs who found the game relevant to their practice — recommendation scores ranged <span class="lime">7 to 10.</span>
+          </p>
+          <p class="metric-body" style="color: rgba(255,255,255,0.7);">
+            High peer-advocacy intent was consistently linked to the game's clinical realism and the practical value of having precise, retrievable statistics for patient conversations.
+          </p>
+        </div>
+
+        <div style="padding-left: 40px; border-left: 1px solid rgba(255,255,255,0.12);">
+          <p class="mono lime">Where HCPs would share it</p>
+          <div class="stack-32" style="margin-top: 36px;">
+            <div style="display: flex; gap: 24px; align-items: flex-start;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--lime); flex: none;"></div>
+              <div>
+                <p class="body" style="color: #fff; font-weight: 400;">Early-career colleagues</p>
+                <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 6px;">Navigating their first years of hesitancy conversation.</p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 24px; align-items: flex-start;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--lime); flex: none;"></div>
+              <div>
+                <p class="body" style="color: #fff; font-weight: 400;">Residency program orientations</p>
+                <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 6px;">A repeatable training surface for incoming cohorts.</p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 24px; align-items: flex-start;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--lime); flex: none;"></div>
+              <div>
+                <p class="body" style="color: #fff; font-weight: 400;">Multidisciplinary care teams</p>
+                <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 6px;">Wherever multiple staff members engage with hesitant patients.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span>Healthy Discussions · Sales Narrative</span><span>10</span></div>
+  </section>
+
+
+  <!-- 11 METRIC — FUTURE ENGAGEMENT -->
+  <section class="paper metric" data-label="11 Future Engagement">
+    <div class="topbar">
+      <span class="crumb-paper">By the Numbers · 06 of 07</span>
+      <span class="doc">Intent</span>
+    </div>
+    <div class="frame">
+      <div class="metric-grid">
+        <div class="stack-32">
+          <div class="metric-label">Metric 06 · Future Engagement Intent</div>
+          <div class="display-num-stack">
+            <span class="display-num">6</span>
+            <span class="unit" style="color: var(--muted);">of 7 HCPs</span>
+          </div>
+          <hr style="background: var(--burnt); height: 4px; width: 80px; border: 0;" />
+          <p class="metric-headline">
+            Among HCPs who engaged positively with the game, six of seven rated their likelihood to engage with a future game-based learning tool at <strong style="font-weight: 500;">6 or 7 out of 7.</strong>
+          </p>
+          <p class="metric-body" style="color: var(--muted);">
+            And that intent extended beyond COVID — participants asked for game-based formats across treatments, disease states, and pharmaceuticals in their specialty.
+          </p>
+        </div>
+
+        <div style="padding-left: 40px;">
+          <p class="mono burnt">Future Intent — 6 or 7 / 7</p>
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 18px; margin-top: 36px;">
+            <div style="aspect-ratio: 1; background: var(--burnt);"></div>
+            <div style="aspect-ratio: 1; background: var(--burnt);"></div>
+            <div style="aspect-ratio: 1; background: var(--burnt);"></div>
+            <div style="aspect-ratio: 1; background: var(--burnt);"></div>
+            <div style="aspect-ratio: 1; background: var(--burnt);"></div>
+            <div style="aspect-ratio: 1; background: var(--burnt);"></div>
+            <div style="aspect-ratio: 1; background: rgba(8,31,43,0.14);"></div>
+          </div>
+          <p class="small" style="color: var(--muted); margin-top: 28px;">Each square represents one HCP from the engaged cohort.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>11</span></div>
+  </section>
+
+
+  <!-- 12 METRIC — DEMAND ACROSS TAs -->
+  <section class="dark with-noise metric" data-label="12 Cross-TA Demand">
+    <div class="topbar">
+      <span class="crumb">By the Numbers · 07 of 07</span>
+      <span class="doc">Portfolio Demand</span>
+    </div>
+    <div class="frame">
+      <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 120px; align-items: center;">
+        <div class="stack-32">
+          <div class="metric-label" style="color: var(--lime);">Metric 07 · Cross-TA Demand</div>
+          <h2 class="title" style="font-size: 64px;">
+            Near-universal interest <span class="lime">in the format</span> — not just this game.
+          </h2>
+          <hr class="rule-lime" />
+          <p class="metric-body" style="color: rgba(255,255,255,0.78); max-width: 540px;">
+            When asked which other clinical topics they would want in a game-based format, HCPs answered consistently and broadly.
+          </p>
+        </div>
+
+        <div>
+          <div style="display: grid; grid-template-columns: 260px 1fr 140px; gap: 32px; align-items: center; padding: 30px 0; border-top: 1px solid rgba(255,255,255,0.16);">
+            <div class="body" style="color: #fff; font-weight: 400;">Treatments</div>
+            <div style="height: 28px; background: rgba(255,255,255,0.08); position: relative;">
+              <div style="position: absolute; inset: 0 9.1% 0 0; background: var(--lime);"></div>
+            </div>
+            <div class="body" style="text-align: right; color: var(--lime); font-weight: 500;">10 / 11</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 260px 1fr 140px; gap: 32px; align-items: center; padding: 30px 0; border-top: 1px solid rgba(255,255,255,0.16);">
+            <div class="body" style="color: #fff; font-weight: 400;">Disease states</div>
+            <div style="height: 28px; background: rgba(255,255,255,0.08); position: relative;">
+              <div style="position: absolute; inset: 0 27.3% 0 0; background: var(--lime); opacity: 0.78;"></div>
+            </div>
+            <div class="body" style="text-align: right; color: var(--lime); font-weight: 500;">8 / 11</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 260px 1fr 140px; gap: 32px; align-items: center; padding: 30px 0; border-top: 1px solid rgba(255,255,255,0.16); border-bottom: 1px solid rgba(255,255,255,0.16);">
+            <div class="body" style="color: #fff; font-weight: 400;">Pharmaceuticals</div>
+            <div style="height: 28px; background: rgba(255,255,255,0.08); position: relative;">
+              <div style="position: absolute; inset: 0 36.4% 0 0; background: var(--lime); opacity: 0.6;"></div>
+            </div>
+            <div class="body" style="text-align: right; color: var(--lime); font-weight: 500;">7 / 11</div>
+          </div>
+          <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 32px;">HCPs who selected each topic as a desired game-based learning area. Multiple selections permitted.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span>Healthy Discussions · Sales Narrative</span><span>12</span></div>
+  </section>
+
+
+  <!-- 13 SECTION DIVIDER — WHAT THE RESEARCH SHOWS -->
+  <section class="section-div" data-label="13 Section / Research">
+    <div class="frame">
+      <div class="section-kicker">Section Three</div>
+      <div class="roman">03</div>
+      <h2 class="section-title">What the research shows.</h2>
+      <div class="section-rule"></div>
+      <p class="lede" style="margin-top: 48px; max-width: 1100px; color: rgba(255,255,255,0.78);">
+        Five findings from eleven moderated sessions — the why behind the numbers.
+      </p>
+    </div>
+    <div class="footbar"><span>Relevate Health</span><span>13</span></div>
+  </section>
+
+
+  <!-- 14 FINDING 1 — Conversational skills -->
+  <section class="paper" data-label="14 Finding 1">
+    <div class="topbar"><span class="crumb-paper">Research · Finding 01 of 05</span><span class="doc">Conversational Skills</span></div>
+    <div class="frame">
+      <div style="display: grid; grid-template-columns: 1fr 1.1fr; gap: 120px; align-items: flex-start; margin-top: 30px;">
+        <div class="stack-32">
+          <div class="finding-num">01</div>
+          <hr class="rule" style="background: var(--burnt); height: 4px; width: 80px;" />
+          <h2 class="title" style="font-size: 60px;">
+            The game builds the conversational skill HCPs need most:
+            <span class="burnt">identifying why.</span>
+          </h2>
+        </div>
+        <div class="stack-32">
+          <p class="lede" style="font-size: 32px; color: var(--ink);">
+            Before choosing a response, HCPs need to know <em style="font-style: normal; color: var(--burnt); font-weight: 500;">which</em> hesitancy they're dealing with.
+          </p>
+          <p class="body" style="color: var(--muted);">
+            The concern-identification framework — mapping patient statements to categories like adverse-event fear, public-figure distrust, and social media misinformation — was described as immediately transferable to real patient conversations.
+          </p>
+          <p class="body" style="color: var(--muted);">
+            HCPs with lower baseline confidence reported the clearest gains. Those gains were explicitly attributed to the framework, with the statistical data backing it up.
+          </p>
+          <blockquote style="margin: 16px 0 0; padding: 28px 32px; background: rgba(188,71,0,0.08); border-left: 4px solid var(--burnt);">
+            <p style="font-size: 28px; line-height: 1.45; font-weight: 300; color: var(--ink); font-style: italic;">
+              A family medicine physician described going from a confidence score of 4 to 6 specifically for challenging pediatric vaccine conversations — attributing the gain to what she learned in the game's data and dialogue modules.
+            </p>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>14</span></div>
+  </section>
+
+
+  <!-- 15 FINDING 2 — Data at point of care -->
+  <section class="dark with-noise" data-label="15 Finding 2">
+    <div class="topbar"><span class="crumb">Research · Finding 02 of 05</span><span class="doc">Point of Care Data</span></div>
+    <div class="frame">
+      <div style="display: grid; grid-template-columns: 1fr 1.1fr; gap: 120px; align-items: flex-start; margin-top: 30px;">
+        <div class="stack-32">
+          <div class="finding-num">02</div>
+          <hr class="rule-lime" />
+          <h2 class="title" style="font-size: 60px; color: #fff;">
+            Clinical data HCPs will actually use
+            <span class="lime">at the point of care.</span>
+          </h2>
+        </div>
+        <div class="stack-32">
+          <p class="lede" style="font-size: 32px; color: rgba(255,255,255,0.92);">
+            COVID hospitalization, mortality, and adverse-event rates by age group — the most consistently valued element across participant types.
+          </p>
+          <p class="body" style="color: rgba(255,255,255,0.72);">
+            HCPs knew these conversations required evidence, but few had precise, retrievable numbers. The game closes that gap.
+          </p>
+          <div class="three-col" style="margin-top: 24px;">
+            <div>
+              <div class="display-num" style="font-size: 64px;">7/7</div>
+              <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 12px;">Learning effectiveness ratings driven by the statistical layer.</p>
+            </div>
+            <div>
+              <div class="display-num" style="font-size: 64px;">10/10</div>
+              <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 12px;">Enjoyment of data modules — among physicians who described journal articles as putting them to sleep.</p>
+            </div>
+            <div>
+              <div class="display-num" style="font-size: 64px;">→</div>
+              <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 12px;">One HCP planned to keep the key statistics on a card in her coat pocket.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span>Healthy Discussions · Sales Narrative</span><span>15</span></div>
+  </section>
+
+
+  <!-- 16 FINDING 3 — receptivity -->
+  <section class="paper" data-label="16 Finding 3">
+    <div class="topbar"><span class="crumb-paper">Research · Finding 03 of 05</span><span class="doc">Receptivity</span></div>
+    <div class="frame">
+      <div style="display: grid; grid-template-columns: 1fr 1.1fr; gap: 120px; align-items: flex-start; margin-top: 30px;">
+        <div class="stack-32">
+          <div class="finding-num">03</div>
+          <hr class="rule" style="background: var(--burnt); height: 4px; width: 80px;" />
+          <h2 class="title" style="font-size: 60px;">
+            HCPs are receptive — <span class="burnt">across experience levels and specialties.</span>
+          </h2>
+        </div>
+        <div class="stack-32">
+          <p class="lede" style="font-size: 32px;">
+            Physicians, PAs, family medicine, internal medicine, urgent care, early- and senior-career — the same answer.
+          </p>
+          <p class="body" style="color: var(--muted);">
+            Clinicians who grew up on video games described the format as a natural fit. Clinicians who did not described it as a welcome relief from journal articles and compliance modules.
+          </p>
+          <blockquote style="margin: 16px 0 0; padding: 28px 32px; background: rgba(188,71,0,0.08); border-left: 4px solid var(--burnt);">
+            <p style="font-size: 28px; line-height: 1.45; font-weight: 300; color: var(--ink); font-style: italic;">
+              A physician assistant with 10 years in urgent care rated her hesitation at 1 out of 7 and described her experience as:
+              <span style="display: block; margin-top: 16px; font-weight: 500; color: var(--burnt); font-style: normal;">"This is like a real conversation. This is exactly what happens."</span>
+            </p>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>16</span></div>
+  </section>
+
+
+  <!-- 17 FINDING 4 — Peer advocacy -->
+  <section class="dark with-noise" data-label="17 Finding 4">
+    <div class="topbar"><span class="crumb">Research · Finding 04 of 05</span><span class="doc">Peer Advocacy</span></div>
+    <div class="frame">
+      <div style="display: grid; grid-template-columns: 1fr 1.1fr; gap: 120px; align-items: flex-start; margin-top: 30px;">
+        <div class="stack-32">
+          <div class="finding-num">04</div>
+          <hr class="rule-lime" />
+          <h2 class="title" style="font-size: 60px; color: #fff;">
+            High recommendation intent <span class="lime">becomes a distribution channel.</span>
+          </h2>
+        </div>
+        <div class="stack-32">
+          <p class="lede" style="font-size: 32px; color: rgba(255,255,255,0.92);">
+            Among relevant-fit HCPs, recommendation scores averaged above 9 out of 10 — not passive endorsements.
+          </p>
+          <p class="body" style="color: rgba(255,255,255,0.72);">
+            Participants named specific peer contexts where they would share the game: with early-career colleagues, in residency orientations, across multidisciplinary care teams.
+          </p>
+          <p class="body" style="color: rgba(255,255,255,0.72);">
+            An HCP who recommends a learning tool to colleagues is a trusted distribution channel — far more credible than a pharma email or a website banner.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span>Healthy Discussions · Sales Narrative</span><span>17</span></div>
+  </section>
+
+
+  <!-- 18 FINDING 5 — Format gap -->
+  <section class="paper" data-label="18 Finding 5">
+    <div class="topbar"><span class="crumb-paper">Research · Finding 05 of 05</span><span class="doc">Format Gap</span></div>
+    <div class="frame">
+      <div style="display: grid; grid-template-columns: 1fr 1.1fr; gap: 120px; align-items: flex-start; margin-top: 30px;">
+        <div class="stack-32">
+          <div class="finding-num">05</div>
+          <hr class="rule" style="background: var(--burnt); height: 4px; width: 80px;" />
+          <h2 class="title" style="font-size: 60px;">
+            Game-based learning addresses <span class="burnt">a format gap traditional CME has left open.</span>
+          </h2>
+        </div>
+        <div class="stack-32">
+          <p class="lede" style="font-size: 32px;">
+            Existing tools are informative but not engaging — or engaging but not informative. The game occupies the position neither delivers.
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 8px;">
+            <div style="padding: 28px 28px; background: var(--paper-2);">
+              <p class="mono" style="color: var(--muted);">Traditional formats</p>
+              <ul style="list-style: none; padding: 0; margin: 18px 0 0;" class="stack-12">
+                <li class="body" style="color: var(--muted);">— Journal articles</li>
+                <li class="body" style="color: var(--muted);">— CDC fact sheets</li>
+                <li class="body" style="color: var(--muted);">— Webinars (charted-through)</li>
+                <li class="body" style="color: var(--muted);">— Static PDF modules</li>
+              </ul>
+            </div>
+            <div style="padding: 28px 28px; background: var(--navy-1); color: #fff;">
+              <p class="mono" style="color: var(--lime);">Healthy Discussions</p>
+              <ul style="list-style: none; padding: 0; margin: 18px 0 0;" class="stack-12">
+                <li class="body" style="color: rgba(255,255,255,0.92);">— Data-rich</li>
+                <li class="body" style="color: rgba(255,255,255,0.92);">— Interactive</li>
+                <li class="body" style="color: rgba(255,255,255,0.92);">— Clinically contextual</li>
+                <li class="body" style="color: rgba(255,255,255,0.92);">— Designed for HCPs</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>18</span></div>
+  </section>
+
+
+  <!-- 19 SECTION DIVIDER — HCP VOICE -->
+  <section class="section-div" data-label="19 Section / HCP Voice">
+    <div class="frame">
+      <div class="section-kicker">Section Four</div>
+      <div class="roman">04</div>
+      <h2 class="section-title">In their own words.</h2>
+      <div class="section-rule"></div>
+      <p class="lede" style="margin-top: 48px; max-width: 1100px; color: rgba(255,255,255,0.78);">
+        Six voices from the eleven HCPs who participated in moderated research sessions.
+      </p>
+    </div>
+    <div class="footbar"><span>Relevate Health</span><span>19</span></div>
+  </section>
+
+
+  <!-- 20 QUOTES A — two -->
+  <section class="paper" data-label="20 Quotes A">
+    <div class="topbar"><span class="crumb-paper">HCP Voice · 01 of 03</span><span class="doc">Quotes</span></div>
+    <div class="frame">
+      <div class="two-col" style="margin-top: 60px; gap: 100px;">
+        <div class="stack-32">
+          <div class="quote-mark">"</div>
+          <p style="font-size: 32px; line-height: 1.42; font-weight: 300; color: var(--ink); font-style: italic;">
+            Not every hesitant patient is hesitant for the same reason. The game helped me think through how to identify <em style="color: var(--burnt); font-style: normal; font-weight: 500;">why</em> a patient is resistant before jumping to the scripted response. And having actual statistics I could cite in the conversation — that's the difference between a talking point and a convincing argument.
+          </p>
+          <div style="margin-top: 20px;">
+            <hr class="rule" style="background: var(--burnt); height: 2px; width: 60px; border: 0;" />
+            <p class="small" style="margin-top: 18px; color: var(--ink); font-weight: 500;">Internal medicine physician, recently in practice</p>
+            <p class="small" style="color: var(--muted); margin-top: 4px;">Reported a +2 confidence gain after completing the game</p>
+          </div>
+        </div>
+
+        <div class="stack-32">
+          <div class="quote-mark">"</div>
+          <p style="font-size: 32px; line-height: 1.42; font-weight: 300; color: var(--ink); font-style: italic;">
+            I actually wanted to write the numbers down. Not to use the game in the exam room — but I'd keep a card in my coat pocket. When a patient says they've heard the vaccine is dangerous, I can pull it out and say: here is the actual rate of adverse events in patients your age. <em style="color: var(--burnt); font-style: normal; font-weight: 500;">Specific numbers land differently than general reassurance.</em>
+          </p>
+          <div style="margin-top: 20px;">
+            <hr class="rule" style="background: var(--burnt); height: 2px; width: 60px; border: 0;" />
+            <p class="small" style="margin-top: 18px; color: var(--ink); font-weight: 500;">Senior internal medicine physician, private practice</p>
+            <p class="small" style="color: var(--muted); margin-top: 4px;">Rated game effectiveness 7 out of 7</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>20</span></div>
+  </section>
+
+
+  <!-- 21 QUOTES B — two on dark -->
+  <section class="dark with-noise" data-label="21 Quotes B">
+    <div class="topbar"><span class="crumb">HCP Voice · 02 of 03</span><span class="doc">Quotes</span></div>
+    <div class="frame">
+      <div class="two-col" style="margin-top: 60px; gap: 100px;">
+        <div class="stack-32">
+          <div class="quote-mark">"</div>
+          <p style="font-size: 32px; line-height: 1.42; font-weight: 300; color: rgba(255,255,255,0.95); font-style: italic;">
+            The scenarios aren't hypothetical. These are conversations I have every single week. The hesitancy types the game surfaces, the way the patient pushes back, the social media concern, the adverse event fear — that's real. <em style="color: var(--lime); font-style: normal; font-weight: 500;">It felt like a simulation of my actual practice, not a training module someone designed in a conference room.</em>
+          </p>
+          <div style="margin-top: 20px;">
+            <hr class="rule-lime" style="width: 60px; height: 2px;" />
+            <p class="small" style="margin-top: 18px; color: #fff; font-weight: 500;">Physician assistant, urgent care + primary care</p>
+            <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 4px;">10 years in practice · Likelihood to recommend 9–10 / 10</p>
+          </div>
+        </div>
+
+        <div class="stack-32">
+          <div class="quote-mark">"</div>
+          <p style="font-size: 32px; line-height: 1.42; font-weight: 300; color: rgba(255,255,255,0.95); font-style: italic;">
+            What this tool does well is remind you that patients aren't just 'anti-vaccine.' They have specific fears — misinformation, side effects, distrust of institutions — and the game helps you identify which one you're actually dealing with. <em style="color: var(--lime); font-style: normal; font-weight: 500;">I see this working for everyone on the care team who has these conversations, not just the physician.</em>
+          </p>
+          <div style="margin-top: 20px;">
+            <hr class="rule-lime" style="width: 60px; height: 2px;" />
+            <p class="small" style="margin-top: 18px; color: #fff; font-weight: 500;">Physician, 35+ years in practice</p>
+            <p class="small" style="color: rgba(255,255,255,0.6); margin-top: 4px;">Effectiveness 7/7 · Likelihood to recommend 10/10</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span>Healthy Discussions · Sales Narrative</span><span>21</span></div>
+  </section>
+
+
+  <!-- 22 QUOTES C — two -->
+  <section class="paper" data-label="22 Quotes C">
+    <div class="topbar"><span class="crumb-paper">HCP Voice · 03 of 03</span><span class="doc">Quotes</span></div>
+    <div class="frame">
+      <div class="two-col" style="margin-top: 60px; gap: 100px;">
+        <div class="stack-32">
+          <div class="quote-mark">"</div>
+          <p style="font-size: 32px; line-height: 1.42; font-weight: 300; color: var(--ink); font-style: italic;">
+            The data modules changed the quality of the experience. I went from curious to genuinely engaged. I went in expecting the usual talking points. What I got was actual statistics I could remember and repeat — hospitalization rates, adverse event comparisons, vaccine uptake data. <em style="color: var(--burnt); font-style: normal; font-weight: 500;">That's what a hesitant patient needs to hear, and now I have it.</em>
+          </p>
+          <div style="margin-top: 20px;">
+            <hr class="rule" style="background: var(--burnt); height: 2px; width: 60px; border: 0;" />
+            <p class="small" style="margin-top: 18px; color: var(--ink); font-weight: 500;">Family medicine physician, mid-career</p>
+            <p class="small" style="color: var(--muted); margin-top: 4px;">Likelihood to recommend 7–8 / 10</p>
+          </div>
+        </div>
+
+        <div class="stack-32">
+          <div class="quote-mark">"</div>
+          <p style="font-size: 32px; line-height: 1.42; font-weight: 300; color: var(--ink); font-style: italic;">
+            I'd share this with colleagues. It reinforces the case for vaccination in a way that is evidence-backed, and the format makes the evidence stick better than reading another journal article. <em style="color: var(--burnt); font-style: normal; font-weight: 500;">Learning something through an interactive experience is just different than reading it — I remembered more.</em>
+          </p>
+          <div style="margin-top: 20px;">
+            <hr class="rule" style="background: var(--burnt); height: 2px; width: 60px; border: 0;" />
+            <p class="small" style="margin-top: 18px; color: var(--ink); font-weight: 500;">Family medicine physician, recently in practice</p>
+            <p class="small" style="color: var(--muted); margin-top: 4px;">Likelihood to recommend 9 / 10</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>22</span></div>
+  </section>
+
+
+  <!-- 23 SECTION DIVIDER — THE OPPORTUNITY -->
+  <section class="section-div" data-label="23 Section / Opportunity">
+    <div class="frame">
+      <div class="section-kicker">Section Five</div>
+      <div class="roman">05</div>
+      <h2 class="section-title">The opportunity.</h2>
+      <div class="section-rule"></div>
+      <p class="lede" style="margin-top: 48px; max-width: 1100px; color: rgba(255,255,255,0.78);">
+        From a single product to a scalable HCP education channel — what the research enables you to build.
+      </p>
+    </div>
+    <div class="footbar"><span>Relevate Health</span><span>23</span></div>
+  </section>
+
+
+  <!-- 24 PORTFOLIO POTENTIAL -->
+  <section class="paper" data-label="24 Portfolio Potential">
+    <div class="topbar"><span class="crumb-paper">The Opportunity · 01 of 04</span><span class="doc">Portfolio</span></div>
+    <div class="frame">
+      <div style="margin-top: 30px;">
+        <p class="eyebrow">From product · to channel</p>
+        <h2 class="title" style="margin-top: 32px; max-width: 1500px; font-size: 78px;">
+          A format with proven HCP demand — and <span class="burnt">portfolio-wide potential.</span>
+        </h2>
+      </div>
+
+      <div class="three-col" style="margin-top: auto; padding-top: 80px; align-items: flex-start;">
+        <div class="stack-24">
+          <div class="display-num" style="color: var(--burnt); font-size: 110px;">10<span style="font-size: 48px; color: var(--muted);">/11</span></div>
+          <p class="body" style="font-weight: 500;">Treatments</p>
+          <p class="small" style="color: var(--muted); max-width: 320px;">A near-universal request for game-based learning on therapeutic agents.</p>
+        </div>
+        <div class="stack-24">
+          <div class="display-num" style="color: var(--burnt); font-size: 110px;">8<span style="font-size: 48px; color: var(--muted);">/11</span></div>
+          <p class="body" style="font-weight: 500;">Disease states</p>
+          <p class="small" style="color: var(--muted); max-width: 320px;">Pathophysiology, diagnosis, staging — the building blocks of clinical judgment.</p>
+        </div>
+        <div class="stack-24">
+          <div class="display-num" style="color: var(--burnt); font-size: 110px;">7<span style="font-size: 48px; color: var(--muted);">/11</span></div>
+          <p class="body" style="font-weight: 500;">Pharmaceuticals</p>
+          <p class="small" style="color: var(--muted); max-width: 320px;">Mechanism of action, dosing, evidence — the standing brief of medical affairs.</p>
+        </div>
+      </div>
+      <p class="small" style="color: var(--muted); margin-top: 60px; max-width: 1400px;">
+        This is interest in a format, not interest in a single game. For a pharmaceutical company with a portfolio and a standing need to educate HCPs, that signal represents an education channel — not a one-time campaign.
+      </p>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>24</span></div>
+  </section>
+
+
+  <!-- 25 REACHING HCPs / TIME -->
+  <section class="dark with-noise" data-label="25 Reaching HCPs">
+    <div class="topbar"><span class="crumb">The Opportunity · 02 of 04</span><span class="doc">Time &amp; Access</span></div>
+    <div class="frame">
+      <div style="margin-top: 30px;">
+        <p class="eyebrow" style="color: var(--lime);">Reaching HCPs where they are</p>
+        <h2 class="title" style="margin-top: 32px; max-width: 1600px; color: #fff;">
+          Mobile-first, self-paced, segment-completable — designed for the <span class="lime">fifteen-minute window</span> webinars can't fill.
+        </h2>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 60px; margin-top: auto; padding-top: 90px;">
+        <div class="stack-24">
+          <div class="mono lime">Window 01</div>
+          <p class="subtitle" style="font-size: 32px; font-weight: 400; color: #fff;">Between patients</p>
+          <p class="small" style="color: rgba(255,255,255,0.65);">The unpredictable 10–15 minute gap in a clinic day.</p>
+        </div>
+        <div class="stack-24">
+          <div class="mono lime">Window 02</div>
+          <p class="subtitle" style="font-size: 32px; font-weight: 400; color: #fff;">Lunch breaks</p>
+          <p class="small" style="color: rgba(255,255,255,0.65);">Mobile-first design fits one-handed phone use.</p>
+        </div>
+        <div class="stack-24">
+          <div class="mono lime">Window 03</div>
+          <p class="subtitle" style="font-size: 32px; font-weight: 400; color: #fff;">Admin half-days</p>
+          <p class="small" style="color: rgba(255,255,255,0.65);">The Wednesday block that's already protected for learning.</p>
+        </div>
+        <div class="stack-24">
+          <div class="mono lime">Window 04</div>
+          <p class="subtitle" style="font-size: 32px; font-weight: 400; color: #fff;">Evenings, post-clinical</p>
+          <p class="small" style="color: rgba(255,255,255,0.65);">Self-paced, no scheduled commitment, resumable.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span>Healthy Discussions · Sales Narrative</span><span>25</span></div>
+  </section>
+
+
+  <!-- 26 COMPETITIVE DIFF -->
+  <section class="paper" data-label="26 Competitive Differentiation">
+    <div class="topbar"><span class="crumb-paper">The Opportunity · 03 of 04</span><span class="doc">Differentiation</span></div>
+    <div class="frame">
+      <div style="margin-top: 30px;">
+        <p class="eyebrow">Engagement is the new completion</p>
+        <h2 class="title" style="margin-top: 32px; max-width: 1500px; font-size: 78px;">
+          Enjoyment isn't a vanity metric — <span class="burnt">it's a proxy for retention.</span>
+        </h2>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.05fr 1fr; gap: 100px; margin-top: 80px; align-items: stretch;">
+        <div style="padding: 48px 48px; background: var(--paper-2);">
+          <p class="mono" style="color: var(--muted);">Traditional CME</p>
+          <p class="subtitle" style="margin-top: 28px; font-weight: 400; color: var(--ink); font-size: 38px;">A completion problem.</p>
+          <ul style="list-style: none; padding: 0; margin: 32px 0 0;" class="stack-24">
+            <li class="body" style="color: var(--muted);">— Webinars attended while charting.</li>
+            <li class="body" style="color: var(--muted);">— PDF modules opened and closed.</li>
+            <li class="body" style="color: var(--muted);">— Journal articles read at varying attention.</li>
+          </ul>
+          <p class="body" style="margin-top: 32px; color: var(--muted);">A disengaged HCP isn't retaining anything.</p>
+        </div>
+
+        <div style="padding: 48px 48px; background: var(--navy-1); color: #fff;">
+          <p class="mono" style="color: var(--lime);">Healthy Discussions</p>
+          <p class="subtitle" style="margin-top: 28px; font-weight: 400; color: #fff; font-size: 38px;">An attention proxy.</p>
+          <ul style="list-style: none; padding: 0; margin: 32px 0 0;" class="stack-24">
+            <li class="body" style="color: rgba(255,255,255,0.92);">— Enjoyment scores of <strong style="color: var(--lime); font-weight: 500;">8–10 / 10</strong> on the educational core.</li>
+            <li class="body" style="color: rgba(255,255,255,0.92);">— Engaged HCPs retain content.</li>
+            <li class="body" style="color: rgba(255,255,255,0.92);">— Learning and enjoyment move in the same direction.</li>
+          </ul>
+          <p class="body" style="margin-top: 32px; color: var(--lime); font-weight: 400;">When content is clinically grounded and the format respects HCPs' time, attention follows.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footbar" style="color: rgba(8,31,43,0.5);"><span>Healthy Discussions · Sales Narrative</span><span>26</span></div>
+  </section>
+
+
+  <!-- 27 ROI / BEHAVIOR CHANGE -->
+  <section class="dark with-noise" data-label="27 ROI">
+    <div class="topbar"><span class="crumb">The Opportunity · 04 of 04</span><span class="doc">ROI</span></div>
+    <div class="frame">
+      <div style="margin-top: 30px;">
+        <p class="eyebrow" style="color: var(--lime);">ROI anchored in behavior change</p>
+        <h2 class="title" style="margin-top: 32px; max-width: 1600px; color: #fff; font-size: 78px;">
+          Confidence in a product conversation translates directly to <span class="lime">recommendation behavior.</span>
+        </h2>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 80px 1fr; gap: 56px; align-items: flex-start; margin-top: auto; padding-top: 100px;">
+        <div style="font-size: var(--type-display); color: var(--lime); font-weight: 200; line-height: 0.9; letter-spacing: -0.04em;">→</div>
+        <div class="stack-32" style="max-width: 1400px;">
+          <p class="lede" style="font-size: 36px; color: rgba(255,255,255,0.92);">
+            The confidence gains documented here are not abstract survey scores. They are self-reported shifts in a clinician's readiness to have a specific, high-stakes conversation.
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px;">
+            <div>
+              <p class="mono lime">Behavior 01</p>
+              <p class="body" style="color: #fff; margin-top: 14px; font-weight: 400;">Citing specific statistics in patient conversations.</p>
+            </div>
+            <div>
+              <p class="mono lime">Behavior 02</p>
+              <p class="body" style="color: #fff; margin-top: 14px; font-weight: 400;">Identifying hesitancy type before responding.</p>
+            </div>
+            <div>
+              <p class="mono lime">Behavior 03</p>
+              <p class="body" style="color: #fff; margin-top: 14px; font-weight: 400;">Framing adverse-event risk in precise, not general, terms.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span>Healthy Discussions · Sales Narrative</span><span>27</span></div>
+  </section>
+
+
+  <!-- 28 CLOSING / CTA -->
+  <section class="cover" style="
+    background:
+      linear-gradient(95deg, rgba(6,16,28,0.94) 0%, rgba(6,16,28,0.82) 45%, rgba(8,31,43,0.55) 75%, rgba(8,31,43,0.2) 100%),
+      url('assets/img-care.jpg') center/cover no-repeat,
+      #000;
+  " data-label="28 Call to Action">
+    <div class="frame" style="justify-content: space-between;">
+      <div class="lockup" style="margin-top: 10px;">
+        <img class="sphere" src="assets/sphere-mark.png" alt="" style="width: 64px; height: auto;" />
+        <img class="wordmark" src="assets/relevate-wordmark.svg" alt="Relevate Health" style="height: 28px; opacity: 1;" />
+      </div>
+
+      <div>
+        <div class="eyebrow" style="color: var(--lime); margin-bottom: 36px;">Conclusion · Call to Action</div>
+        <h2 class="title-xl" style="max-width: 1600px; color: #fff; font-size: 104px;">
+          Let's build the education channel
+          <span class="lime">your current investments are leaving on the table.</span>
+        </h2>
+        <hr class="rule-lime" style="margin-top: 56px;" />
+        <p class="lede" style="margin-top: 40px; max-width: 1300px; color: rgba(255,255,255,0.82);">
+          A purpose-built, game-based learning program — for your products and your target HCP audience — delivering outcomes traditional formats have not.
+        </p>
+      </div>
+
+      <div class="meta-row">
+        <div class="meta" style="color: rgba(255,255,255,0.7);">Next step<strong style="color: #fff;">Half-day session with your team</strong></div>
+        <div class="meta" style="color: rgba(255,255,255,0.7);">We bring<strong style="color: #fff;">The full research record</strong></div>
+        <div class="meta" style="color: rgba(255,255,255,0.7);">You leave with<strong style="color: #fff;">A scoped program for your portfolio</strong></div>
+      </div>
+    </div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
